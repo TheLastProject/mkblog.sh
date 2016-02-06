@@ -107,19 +107,21 @@ build() {
         posttitle=$(echo "${docbasename#*-*-*-}" | tr '-' ' ' )
         posttitle=${posttitle%.md}
 
+        beforeposthtml="<h1 class='title'>$posttitle</h1><br><small class='postdate'>Posted on $postdate</small><article class='post'>"
+        afterposthtml="</article>"
+
         # Create a page
         cat "$1/templates/header.html" >> "$posthtmlfilename"
-        echo "<h1 class='title'>$posttitle</h1><br>" >> "$posthtmlfilename"
-        echo "<small class='postdate'>Posted on $postdate</small>" >> "$posthtmlfilename"
+        echo "$beforeposthtml" >> "$posthtmlfilename"
         < "$doc" markdown >> "$posthtmlfilename"
+        echo "$afterposthtml" >> "$posthtmlfilename"
         cat "$1/templates/footer.html" >> "$posthtmlfilename"
 
         # And a short preview and read more link
-        echo "<h1 class='title'>$posttitle</h1><br>" >> "$1/build/index.html"
-        echo "<small class='postdate'>Posted on $postdate</small>" >> "$1/build/index.html"
+        echo "$beforeposthtml" >> "$1/build/index.html"
         entrypreview=$(< "$doc" head -n 5 | sed -e 's/[[:space:]|.|?|!]*$//')"..."
         echo "$entrypreview" | markdown >> "$1/build/index.html"
-        echo "<p><a class='readmorelink' href='posts/${docnoext}html'>Read more</a></p>" >> "$1/build/index.html"
+        echo "$afterposthtml<p><a class='readmorelink' href='posts/${docnoext}html'>Read more</a></p>" >> "$1/build/index.html"
     done
 
     # Write footer to index file
@@ -153,4 +155,3 @@ else
     usage
     exit 1
 fi
-
