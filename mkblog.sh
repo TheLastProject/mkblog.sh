@@ -25,9 +25,10 @@ usage() {
 # Init blog
 init() {
     # Create directory if nonexistant
-    if [ ! -d "$1/templates" ]; then
-        mkdir -p "$1/templates"
-    fi
+    mkdir "$1"
+    mkdir "$1/templates"
+    mkdir "$1/pages"
+    mkdir "$1/posts"
 
 # Write example header to templates
 cat <<EOF >"$1/templates/header.html"
@@ -100,71 +101,73 @@ build() {
     # Write header to index file
     cat "$1/templates/header.html" >> "$1/build/index.html"
 
-    innav=false
+    # Create navigation
+    echo "<nav id='pages'><ul>" >> "$1/build/index.html"
+    find "$1/pages" -name "$(printf "*\n")" -name '*.md' |
+    while IFS= read -r page
+    do
+        helper_build_setfileinfovars "$1" "$page" "pages"
+        echo "<li><a href='pages/${docnoext}.html'>$(echo "$docnoext" | tr '-' ' ')</a></li>" >> "$1/build/index.html"
 
-    # For each blog entry...
-    for doc in $(find "$1" -iname \*.md | sort -r); do
-        # Make sure there are blog entries
-        if [ "$doc" = "$1/*.md" ]; then
-            echo "$1 has no posts, create some first"
-            exit 4
-        fi
+        helper_build_createpage "$1" "$page" "$beforedochtml" "$afterdochtml" "$dochtmlfilename"
+    done
+    echo "</ul></nav>" >> "$1/build/index.html"
 
-        # Get desired filename
-        docbasename=$(basename "$doc")
-        docnoext=${docbasename%.md}
+    # Create posts
+    find "$1/posts" -name "$(printf "*\n")" -name '*.md' | sort -r |
+    while IFS= read -r post
+    do
+        helper_build_setfileinfovars "$1" "$post" "posts"
 
-        # Make sure the filename is correct (yyyy-mm-dd-title.md)
-        # This is a very simple check because we want to avoid extended regular
-        # expressions, just catch the worst user errors
-        if ! echo "$docbasename" | grep -q "^[0-9]*-[0-9]*-[0-9]*-.*.md$"; then
-            posthtmlfilename="$1/build/pages/${docnoext}.html"
+        helper_build_createpage "$1" "$post" "$beforedochtml" "$afterdochtml" "$dochtmlfilename"
 
-            if ! $innav; then
-                innav=true
-                echo "<nav id='pages'><ul>" >> "$1/build/index.html"
-            fi
-
-            # Configure additional styling HTML
-            beforeposthtml="<h1 class='title'>$(echo "$docnoext" | tr '-' ' ')</h1>"
-            afterposthtml=""
-
-            echo "<li><a href='pages/${docnoext}.html'>$(echo "$docnoext" | tr '-' ' ')</a></li>" >> "$1/build/index.html"
-        else
-            posthtmlfilename="$1/build/posts/${docnoext}.html"
-
-            if $innav; then
-                innav=false
-                echo "</ul></nav>" >> "$1/build/index.html"
-            fi
-
-            # Get date and title
-            postdate=$(echo "$docbasename" | cut -d '-' -f 1-3)
-            posttitle=$(echo "${docbasename#*-*-*-}" | tr '-' ' ')
-            posttitle=${posttitle%.md}
-
-            # Configure additional styling HTML
-            beforeposthtml="<h1 class='title'>$posttitle</h1><small class='postdate'>Posted on $postdate</small><article class='post'>"
-            afterposthtml="</article>"
-
-            # Add a short preview and read more link to the homepage
-            echo "$beforeposthtml" >> "$1/build/index.html"
-            entrypreview=$(< "$doc" head -n 5 | sed -e 's/[[:space:]|.|?|!]*$//')"..."
-            echo "$entrypreview" | markdown >> "$1/build/index.html"
-            echo "$afterposthtml<p><a class='readmorelink' href='posts/${docnoext}.html'>Read more</a></p>" >> "$1/build/index.html"
-        fi
-
-        # Create a page
-        cat "$1/templates/header.html" >> "$posthtmlfilename"
-        echo "<a class='backlink' href='../index.html'>&#66306; Back</a>" >> "$posthtmlfilename"
-        echo "$beforeposthtml" >> "$posthtmlfilename"
-        < "$doc" markdown >> "$posthtmlfilename"
-        echo "$afterposthtml" >> "$posthtmlfilename"
-        cat "$1/templates/footer.html" >> "$posthtmlfilename"
+        # Add a short preview and read more link to the homepage
+        echo "$beforedochtml" >> "$1/build/index.html"
+        entrypreview=$(< "$post" head -n 5 | sed -e 's/[[:space:]|.|?|!]*$//')"..."
+        echo "$entrypreview" | markdown >> "$1/build/index.html"
+        echo "$afterdochtml<p><a class='readmorelink' href='posts/${docnoext}.html'>Read more</a></p>" >> "$1/build/index.html"
     done
 
     # Write footer to index file
     cat "$1/templates/footer.html" >> "$1/build/index.html"
+}
+
+# $1 = blog directory
+# $2 = input document
+# $3 = header html
+# $4 = footer html
+# $5 = output filename
+helper_build_createpage() {
+    cat "$1/templates/header.html" >> "$5"
+    echo "<a class='backlink' href='../index.html'>&#66306; Back</a>" >> "$5"
+    echo "$3" >> "$5"
+    < "$2" markdown >> "$5"
+    echo "$4" >> "$5"
+    cat "$1/templates/footer.html" >> "$5"
+}
+
+# $1 = blog directory
+# $2 = file name
+# $3 = file directory (pages/posts)
+helper_build_setfileinfovars() {
+    # Get desired filename
+    docbasename=$(basename "$2")
+    docnoext=${docbasename%.md}
+    dochtmlfilename="$1/build/$3/${docnoext}.html"
+
+    if [ "$3" = "pages" ]; then
+        beforedochtml="<h1 class='title'>$(echo "$docnoext" | tr '-' ' ')</h1>"
+        afterdochtml=""
+    elif [ "$3" = "posts" ]; then
+        docdate=$(echo "$docbasename" | cut -d '-' -f 1-3)
+        doctitle=${docbasename#*-*-*-}
+        doctitle=${doctitle%.md}
+        beforedochtml="<h1 class='title'>$doctitle</h1><small class='postdate'>Posted on $docdate</small><article class='post'>"
+        afterdochtml="</article>"
+    else
+        echo "Software error"
+        exit 5
+    fi
 }
 
 # Check input

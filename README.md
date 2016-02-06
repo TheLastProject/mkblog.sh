@@ -7,19 +7,29 @@ command.
 ## Usage
 First, create a skeleton for your new blog using `mkblog.sh init <directory>`.
 
-Then, start blogging by putting Markdown files in this directory. mkblog.sh
-enforces the following naming convention for posts: yyyy-mm-dd-title.md. For
-example: `2016-02-04-Hello,-world!.md`. Files ending on .md that do not follow
-this naming convention will be considered pages and put in a navigation bar.
+Add Markdown files in the subdirectory pages to create additional pages, or in
+posts to create blog posts. For the posts, make sure you follow the
+`yyyy-mm-dd-title.md` naming convention. For example:
+`2016-02-04-Hello, world!.md`.
 
-*Note: Do not use spaces in your filenames, use dashes (-) instead.*
-
-When your have one or more posts, run `mkblog.sh build <directory>` to create
-your blog. The HTML will be placed in a subdirectory named `build` in the
-directory of your blog.
+Then, run `mkblog.sh build <directory>` to build your blog. The HTML will be
+placed in a subdirectory named `build` in the directory you are building.
 
 If you want to edit what your blog looks like, just edit
 `templates/header.html` and `templates/footer.html` as you wish.
+
+## Example directory structure
+If you are doing everything right, your blog directory should look like this.
+.
+├── pages
+│   ├── About.md
+│   └── Contact.md
+├── posts
+│   ├── 2016-06-02-Hello again.md
+│   └── 2016-04-02-Hello, world!.md
+└── templates
+    ├── footer.html
+    └── header.html
 
 ## Dependencies
 mkblog.sh, aside from some standard tooling, only requires a markdown parser
