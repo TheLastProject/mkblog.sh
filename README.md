@@ -12,6 +12,8 @@ enforces the following naming convention for posts: yyyy-mm-dd-title.md. For
 example: `2016-02-04-Hello,-world!.md`. Files ending on .md that do not follow
 this naming convention will be considered pages and put in a navigation bar.
 
+*Note: Do not use spaces in your filenames, use dashes (-) instead.*
+
 When your have one or more posts, run `mkblog.sh build <directory>` to create
 your blog. The HTML will be placed in a subdirectory named `build` in the
 directory of your blog.
