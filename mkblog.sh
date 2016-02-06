@@ -46,6 +46,9 @@ cat <<EOF >"$1/templates/header.html"
     p {
       line-height: 1.6;
     }
+    .title {
+      margin-bottom: 0px;
+    }
     .readmorelink {
       text-decoration: none;
       font-weight: bold;
@@ -107,7 +110,7 @@ build() {
         posttitle=$(echo "${docbasename#*-*-*-}" | tr '-' ' ' )
         posttitle=${posttitle%.md}
 
-        beforeposthtml="<h1 class='title'>$posttitle</h1><br><small class='postdate'>Posted on $postdate</small><article class='post'>"
+        beforeposthtml="<h1 class='title'>$posttitle</h1><small class='postdate'>Posted on $postdate</small><article class='post'>"
         afterposthtml="</article>"
 
         # Create a page
