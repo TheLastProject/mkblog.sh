@@ -85,7 +85,7 @@ build() {
     cat "$1/templates/header.html" >> "$1/build/index.html"
 
     # For each blog entry...
-    for doc in $1/*.md; do
+    for doc in $(find "$1" -iname \*.md | sort -r); do
         # Make sure there are blog entries
         if [ "$doc" = "$1/*.md" ]; then
             echo "$1 has no posts, create some first"
