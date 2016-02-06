@@ -139,7 +139,7 @@ build() {
             fi
 
             # Get date and title
-            postdate=${docbasename%-*-*}
+            postdate=$(echo "$docbasename" | cut -d '-' -f 1-3)
             posttitle=$(echo "${docbasename#*-*-*-}" | tr '-' ' ')
             posttitle=${posttitle%.md}
 
