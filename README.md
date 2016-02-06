@@ -8,8 +8,9 @@ command.
 First, create a skeleton for your new blog using `mkblog.sh init <directory>`.
 
 Then, start blogging by putting Markdown files in this directory. mkblog.sh
-enforces the following naming convention: yyyy-mm-dd-title.md. For example:
-`2016-02-04-Hello,-world!.md`.
+enforces the following naming convention for posts: yyyy-mm-dd-title.md. For
+example: `2016-02-04-Hello,-world!.md`. Files ending on .md that do not follow
+this naming convention will be considered pages and put in a navigation bar.
 
 When your have one or more posts, run `mkblog.sh build <directory>` to create
 your blog. The HTML will be placed in a subdirectory named `build` in the
