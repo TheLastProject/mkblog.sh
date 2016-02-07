@@ -25,10 +25,18 @@ usage() {
 # Init blog
 init() {
     # Create directory if nonexistant
-    mkdir "$1"
-    mkdir "$1/templates"
-    mkdir "$1/pages"
-    mkdir "$1/posts"
+    if [ ! -d "$1/" ]; then
+        mkdir "$1/"
+    fi
+    if [ ! -d "$1/templates/" ]; then
+        mkdir "$1/templates/"
+    fi
+    if [ ! -d "$1/pages/" ]; then
+        mkdir "$1/pages/"
+    fi
+    if [ ! -d "$1/posts/" ]; then
+        mkdir "$1/posts/"
+    fi
 
 # Write example header to templates
 cat <<EOF >"$1/templates/header.html"
@@ -112,16 +120,16 @@ build() {
     fi
 
     # Clean build directory
-    if [ -d "$1/build" ]; then
-        rm -rf "$1/build"
+    if [ -d "$1/build/" ]; then
+        rm -rf "$1/build/"
     fi
-    mkdir "$1/build"
-    mkdir "$1/build/posts"
-    mkdir "$1/build/pages"
+    mkdir "$1/build/"
+    mkdir "$1/build/posts/"
+    mkdir "$1/build/pages/"
 
     # Setup navbar and create pages
     navdata="<nav id='pages'><ul>"
-    find "$1/pages" -name "$(printf "*\n")" -name '*.md' > tmp
+    find "$1/pages/" -name "$(printf "*\n")" -name '*.md' > tmp
     while IFS= read -r page
     do
         helper_build_setfileinfovars "$1" "$page" "pages"
@@ -136,7 +144,7 @@ build() {
     helper_build_initpage "$1" "$navdata" "$1/build/index.html"
     # Create posts
     count=-1
-    find "$1/posts" -name "$(printf "*\n")" -name '*.md' | sort -r > tmp
+    find "$1/posts/" -name "$(printf "*\n")" -name '*.md' | sort -r > tmp
     while IFS= read -r post
     do
         count=$((count + 1))
