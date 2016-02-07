@@ -98,11 +98,11 @@ build() {
     mkdir "$1/build/posts"
     mkdir "$1/build/pages"
 
-    # Write header to index file
-    cat "$1/templates/header.html" >> "$1/build/index.html"
+    # Write header and navigation start to index file
+    { cat "$1/templates/header.html";
+      echo "<nav id='pages'><ul>"; } >> "$1/build/index.html"
 
-    # Create navigation
-    echo "<nav id='pages'><ul>" >> "$1/build/index.html"
+    # Create pages
     find "$1/pages" -name "$(printf "*\n")" -name '*.md' |
     while IFS= read -r page
     do
@@ -122,10 +122,11 @@ build() {
         helper_build_createpage "$1" "$post" "$beforedochtml" "$afterdochtml" "$dochtmlfilename"
 
         # Add a short preview and read more link to the homepage
-        echo "$beforedochtml" >> "$1/build/index.html"
         entrypreview=$(< "$post" head -n 5 | sed -e 's/[[:space:]|.|?|!]*$//')"..."
-        echo "$entrypreview" | markdown >> "$1/build/index.html"
-        echo "$afterdochtml<p><a class='readmorelink' href='posts/${docnoext}.html'>Read more</a></p>" >> "$1/build/index.html"
+
+        { echo "$beforedochtml";
+          echo "$entrypreview" | markdown;
+          echo "$afterdochtml<p><a class='readmorelink' href='posts/${docnoext}.html'>Read more</a></p>"; } >> "$1/build/index.html"
     done
 
     # Write footer to index file
@@ -138,12 +139,12 @@ build() {
 # $4 = footer html
 # $5 = output filename
 helper_build_createpage() {
-    cat "$1/templates/header.html" >> "$5"
-    echo "<a class='backlink' href='../index.html'>&#66306; Back</a>" >> "$5"
-    echo "$3" >> "$5"
-    < "$2" markdown >> "$5"
-    echo "$4" >> "$5"
-    cat "$1/templates/footer.html" >> "$5"
+    { cat "$1/templates/header.html";
+      echo "<a class='backlink' href='../index.html'>&#66306; Back</a>";
+      echo "$3";
+      < "$2" markdown;
+      echo "$4";
+      cat "$1/templates/footer.html"; } >> "$5"
 }
 
 # $1 = blog directory
