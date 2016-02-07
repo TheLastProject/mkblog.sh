@@ -195,7 +195,7 @@ helper_build_generateprevnext() {
     extrahtml="<div id='prevnext'>"
     pagesfound=0
     if [ ! -z "$1" ]; then
-        pagesfound=$(($pagesfound + 1))
+        pagesfound=$((pagesfound + 1))
         previouspage=$(($1 - 1))
         if [ $previouspage -eq 0 ]; then
             previouspage=""
@@ -208,7 +208,7 @@ helper_build_generateprevnext() {
     fi
     extrahtml="$extrahtml<span class='cur'>$page</span>"
     if [ ! -z "$2" ]; then
-        pagesfound=$(($pagesfound + 1))
+        pagesfound=$((pagesfound + 1))
         extrahtml="$extrahtml<a class='next' href='index$page.html'>&raquo;</a>"
     else
         extrahtml="$extrahtml<a class='next'></a>"
