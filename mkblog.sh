@@ -55,19 +55,12 @@ cat <<EOF >"$1/templates/header.html"
       display: inline-block;
       margin: 0 1em;
     }
-    #pages a, .backlink {
+    #pages a {
       font-size: 1.25em;
     }
-    .backlink {
+    .backlink, .title {
       display: inline-block;
-      margin-top: 1em;
-    }
-    .title {
       margin-bottom: 0px;
-    }
-    .readmorelink {
-      text-decoration: none;
-      font-weight: bold;
     }
   </style>
 </head>
@@ -124,9 +117,9 @@ build() {
         # Add a short preview and read more link to the homepage
         entrypreview=$(< "$post" head -n 5 | sed -e 's/[[:space:]|.|?|!]*$//')"..."
 
-        { echo "$beforedochtml";
+        { echo "$beforedochtmlwithlink";
           echo "$entrypreview" | markdown;
-          echo "$afterdochtml<p><a class='readmorelink' href='posts/${docnoext}.html'>Read more</a></p>"; } >> "$1/build/index.html"
+          echo "$afterdochtml"; } >> "$1/build/index.html"
     done
 
     # Write footer to index file
@@ -140,7 +133,7 @@ build() {
 # $5 = output filename
 helper_build_createpage() {
     { cat "$1/templates/header.html";
-      echo "<a class='backlink' href='../index.html'>&#66306; Back</a>";
+      echo "<h1 class='backlink'><a href='../index.html'>&#66306; </a></h1>";
       echo "$3";
       < "$2" markdown;
       echo "$4";
@@ -157,13 +150,14 @@ helper_build_setfileinfovars() {
     dochtmlfilename="$1/build/$3/${docnoext}.html"
 
     if [ "$3" = "pages" ]; then
-        beforedochtml="<h1 class='title'>$(echo "$docnoext" | tr '-' ' ')</h1>"
-        afterdochtml=""
+        beforedochtml="<h1 class='title'>${docnoext}</h1><article class='page'>"
+        afterdochtml="</article>"
     elif [ "$3" = "posts" ]; then
         docdate=$(echo "$docbasename" | cut -d '-' -f 1-3)
         doctitle=${docbasename#*-*-*-}
         doctitle=${doctitle%.md}
-        beforedochtml="<h1 class='title'>$doctitle</h1><small class='postdate'>Posted on $docdate</small><article class='post'>"
+        beforedochtml="<h1 class='title'>$doctitle</h1><br><small class='postdate'>$docdate</small><article class='post'>"
+        beforedochtmlwithlink="<h1 class='title'><a href='$3/${docnoext}.html'>$doctitle</a></h1><br><small class='postdate'>$docdate</small><article class='post'>"
         afterdochtml="</article>"
     else
         echo "Software error"
