@@ -20,16 +20,16 @@ If you want to edit what your blog looks like, just edit
 
 ## Example directory structure
 If you are doing everything right, your blog directory should look like this.
-.
-├── pages
-│   ├── About.md
-│   └── Contact.md
-├── posts
-│   ├── 2016-06-02-Hello again.md
-│   └── 2016-04-02-Hello, world!.md
-└── templates
-    ├── footer.html
-    └── header.html
+    .
+    ├── pages
+    │   ├── About.md
+    │   └── Contact.md
+    ├── posts
+    │   ├── 2016-06-02-Hello again.md
+    │   └── 2016-04-02-Hello, world!.md
+    └── templates
+        ├── footer.html
+        └── header.html
 
 ## Dependencies
 mkblog.sh, aside from some standard tooling, only requires a markdown parser
