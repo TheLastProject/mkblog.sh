@@ -73,9 +73,17 @@ cat <<EOF >"$1/templates/header.html"
     #pages a {
       font-size: 1.25em;
     }
-    .backlink, .title {
-      display: inline-block;
+    .title {
       margin-bottom: 0px;
+    }
+    #prevnext {
+      width: 100%;
+      text-align: center;
+    }
+    .prev, .cur, .next {
+      display: inline-block;
+      font-size: 3em;
+      width: 30%;
     }
   </style>
 </head>
@@ -108,56 +116,91 @@ build() {
     mkdir "$1/build/posts"
     mkdir "$1/build/pages"
 
-    # Write header and navigation start to index file
-    { cat "$1/templates/header.html";
-      echo "<nav id='pages'><ul>"; } >> "$1/build/index.html"
-
-    # Create pages
-    find "$1/pages" -name "$(printf "*\n")" -name '*.md' |
+    # Setup navbar and create pages
+    navdata="<nav id='pages'><ul>"
+    find "$1/pages" -name "$(printf "*\n")" -name '*.md' > tmp
     while IFS= read -r page
     do
         helper_build_setfileinfovars "$1" "$page" "pages"
-        echo "<li><a href='pages/${docnoext}.html'>$(echo "$docnoext" | tr '-' ' ')</a></li>" >> "$1/build/index.html"
+        navdata="$navdata<li><a href='pages/${docnoext}.html'>$docnoext</a></li>"
 
-        helper_build_createpage "$1" "$page" "$beforedochtml" "$afterdochtml" "$dochtmlfilename"
-    done
-    echo "</ul></nav><div id='content'>" >> "$1/build/index.html"
+        helper_build_initpage "$1" "" "$dochtmlfilename"
+        helper_build_endpage "$1" "$beforedochtml$(< "$page" markdown)$afterdochtml" "$dochtmlfilename"
+    done < tmp
+    rm tmp
+    navdata="$navdata</ul></nav><div id='content'>"
 
+    helper_build_initpage "$1" "$navdata" "build/index.html"
     # Create posts
-    find "$1/posts" -name "$(printf "*\n")" -name '*.md' | sort -r |
+    count=-1
+    find "$1/posts" -name "$(printf "*\n")" -name '*.md' | sort -r > tmp
     while IFS= read -r post
     do
+        count=$((count + 1))
+        if [ $count -gt 0 ] && [ $((count%10)) -eq 0 ]; then
+            nextpage=$((page + 1))
+            helper_build_endpage "$1" "$(helper_build_generateprevnext "$page" "True")" "build/index$page.html"
+            page=$nextpage
+            helper_build_initpage "$1" "$navdata" "build/index$page.html"
+        fi
         helper_build_setfileinfovars "$1" "$post" "posts"
 
-        helper_build_createpage "$1" "$post" "$beforedochtml" "$afterdochtml" "$dochtmlfilename"
+        helper_build_initpage "$1" "$navdata" "$dochtmlfilename"
+        helper_build_endpage "$1" "$beforedochtml$(< "$post" markdown)$afterdochtml" "$dochtmlfilename"
 
         # Add a short preview and read more link to the homepage
         entrypreview=$(< "$post" head -n 5 | sed -e 's/[[:space:]|.|?|!]*$//')"..."
 
         { echo "$beforedochtmlwithlink";
           echo "$entrypreview" | markdown;
-          echo "$afterdochtml"; } >> "$1/build/index.html"
-    done
+          echo "$afterdochtml"; } >> "$1/build/index$page.html"
+    done < tmp
+    rm tmp
 
-    # Write footer to index file
-    { echo "</div>";
-      cat "$1/templates/footer.html"; } >> "$1/build/index.html"
+    helper_build_endpage "$1" "$(helper_build_generateprevnext "$page")" "build/index$page.html"
 }
 
 # $1 = blog directory
-# $2 = input document
-# $3 = header html
-# $4 = footer html
-# $5 = output filename
-helper_build_createpage() {
-    { cat "$1/templates/header.html";
-      echo "<h1 class='backlink'><a href='../index.html'>&#66306; </a></h1>";
-      echo "$3";
-      < "$2" markdown;
-      echo "$4";
-      cat "$1/templates/footer.html"; } >> "$5"
+# $2 = nav html
+# $3 = pagename
+helper_build_initpage() {
+  { cat "$1/templates/header.html";
+    echo "$2"; } >> "$3"
 }
 
+# $1 = blog directory
+# $2 = extra html (for example pagination or blog article)
+# $3 = pagename
+helper_build_endpage() {
+  { echo "$2";
+    echo "</div>";
+    cat "$1/templates/footer.html"; } >> "$3"
+}
+
+# $1 pagenumber
+# $2 hasnext
+helper_build_generateprevnext() {
+    page=$1
+    extrahtml="<div id='prevnext'>"
+    if [ ! -z "$1" ]; then
+        previouspage=$(($1 - 1))
+        if [ $previouspage -eq 0 ]; then
+            previouspage=""
+        fi
+        extrahtml="$extrahtml<a class='prev' href='index$previouspage.html'>&laquo;</a>"
+        page=$(($1 + 1))
+    else
+        extrahtml="$extrahtml<a class='prev'></a>"
+        page="1"
+    fi
+    extrahtml="$extrahtml<span class='cur'>$page</span>"
+    if [ ! -z "$2" ]; then
+        extrahtml="$extrahtml<a class='next' href='index$page.html'>&raquo;</a>"
+    else
+        extrahtml="$extrahtml<a class='next'></a>"
+    fi
+    echo "$extrahtml</div>"
+}
 # $1 = blog directory
 # $2 = file name
 # $3 = file directory (pages/posts)
