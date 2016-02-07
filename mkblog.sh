@@ -59,6 +59,9 @@ cat <<EOF >"$1/templates/header.html"
       width: auto;
       height: auto;
     }
+    img {
+      max-width: 100%;
+    }
     p {
       line-height: 1.6;
     }
