@@ -160,7 +160,7 @@ build() {
         helper_build_endpage "$1" "$beforedochtml$(< "$post" markdown)$afterdochtml" "$dochtmlfilename"
 
         # Add a short preview and read more link to the homepage
-        entrypreview=$(< "$post" head -n 5 | sed -e 's/[[:space:]|.|?|!]*$//')"..."
+        entrypreview=$(sed -n '1,4p;5s/[[:space:]|,|.|?|!]*$/.../p' "$post")
 
         { echo "$beforedochtmlwithlink";
           echo "$entrypreview" | markdown;
