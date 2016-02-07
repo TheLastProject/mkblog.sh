@@ -130,7 +130,7 @@ build() {
     rm tmp
     navdata="$navdata</ul></nav><div id='content'>"
 
-    helper_build_initpage "$1" "$navdata" "build/index.html"
+    helper_build_initpage "$1" "$navdata" "$1/build/index.html"
     # Create posts
     count=-1
     find "$1/posts" -name "$(printf "*\n")" -name '*.md' | sort -r > tmp
@@ -139,9 +139,9 @@ build() {
         count=$((count + 1))
         if [ $count -gt 0 ] && [ $((count%10)) -eq 0 ]; then
             nextpage=$((page + 1))
-            helper_build_endpage "$1" "$(helper_build_generateprevnext "$page" "True")" "build/index$page.html"
+            helper_build_endpage "$1" "$(helper_build_generateprevnext "$page" "True")" "$1/build/index$page.html"
             page=$nextpage
-            helper_build_initpage "$1" "$navdata" "build/index$page.html"
+            helper_build_initpage "$1" "$navdata" "$1/build/index$page.html"
         fi
         helper_build_setfileinfovars "$1" "$post" "posts"
 
@@ -157,7 +157,7 @@ build() {
     done < tmp
     rm tmp
 
-    helper_build_endpage "$1" "$(helper_build_generateprevnext "$page")" "build/index$page.html"
+    helper_build_endpage "$1" "$(helper_build_generateprevnext "$page")" "$1/build/index$page.html"
 }
 
 # $1 = blog directory
