@@ -15,8 +15,9 @@ posts to create blog posts. For the posts, make sure you follow the
 Then, run `mkblog.sh build <directory>` to build your blog. The HTML will be
 placed in a subdirectory named `build` in the directory you are building.
 
-If you want to edit what your blog looks like, just edit
-`templates/header.html` and `templates/footer.html` as you wish.
+To edit what your blog looks like, just edit `templates/header.html` and
+`templates/footer.html` according to your wishes. However, try to not remove
+the skip div element, as it aids accessibility.
 
 ## Example directory structure
 If you are doing everything right, your blog directory should look like this.

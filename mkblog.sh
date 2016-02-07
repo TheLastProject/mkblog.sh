@@ -80,6 +80,8 @@ cat <<EOF >"$1/templates/header.html"
   </style>
 </head>
 <body>
+  <div id='skip'><a href='#content'>Skip to Main Content</a></div>
+  <h1>My Blog</h1>
 EOF
 
 # Write example footer to templates
@@ -108,7 +110,6 @@ build() {
 
     # Write header and navigation start to index file
     { cat "$1/templates/header.html";
-      echo "<div id='skip'><a href='#content'>Skip to Main Content</a></div>";
       echo "<nav id='pages'><ul>"; } >> "$1/build/index.html"
 
     # Create pages
