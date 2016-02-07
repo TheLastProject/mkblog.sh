@@ -20,6 +20,7 @@ If you want to edit what your blog looks like, just edit
 
 ## Example directory structure
 If you are doing everything right, your blog directory should look like this.
+
     .
     ├── pages
     │   ├── About.md
