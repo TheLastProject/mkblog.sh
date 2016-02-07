@@ -44,6 +44,21 @@ cat <<EOF >"$1/templates/header.html"
       max-width: 100%;
       margin: auto;
     }
+    #skip a
+    {
+      position: absolute;
+      left: -10000px;
+      top: auto;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+    }
+    #skip a:focus
+    {
+      position: static;
+      width: auto;
+      height: auto;
+    }
     p {
       line-height: 1.6;
     }
@@ -93,6 +108,7 @@ build() {
 
     # Write header and navigation start to index file
     { cat "$1/templates/header.html";
+      echo "<div id='skip'><a href='#content'>Skip to Main Content</a></div>";
       echo "<nav id='pages'><ul>"; } >> "$1/build/index.html"
 
     # Create pages
@@ -104,7 +120,7 @@ build() {
 
         helper_build_createpage "$1" "$page" "$beforedochtml" "$afterdochtml" "$dochtmlfilename"
     done
-    echo "</ul></nav>" >> "$1/build/index.html"
+    echo "</ul></nav><div id='content'>" >> "$1/build/index.html"
 
     # Create posts
     find "$1/posts" -name "$(printf "*\n")" -name '*.md' | sort -r |
@@ -123,7 +139,8 @@ build() {
     done
 
     # Write footer to index file
-    cat "$1/templates/footer.html" >> "$1/build/index.html"
+    { echo "</div>";
+      cat "$1/templates/footer.html"; } >> "$1/build/index.html"
 }
 
 # $1 = blog directory
