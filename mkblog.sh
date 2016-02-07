@@ -168,13 +168,13 @@ helper_build_setfileinfovars() {
     dochtmlfilename="$1/build/$3/${docnoext}.html"
 
     if [ "$3" = "pages" ]; then
-        beforedochtml="<h1 class='title'>${docnoext}</h1><article class='page'>"
+        beforedochtml="<h1 class='title'>${docnoext}</h1><article id='content' class='page'>"
         afterdochtml="</article>"
     elif [ "$3" = "posts" ]; then
         docdate=$(echo "$docbasename" | cut -d '-' -f 1-3)
         doctitle=${docbasename#*-*-*-}
         doctitle=${doctitle%.md}
-        beforedochtml="<h1 class='title'>$doctitle</h1><br><small class='postdate'>$docdate</small><article class='post'>"
+        beforedochtml="<h1 class='title'>$doctitle</h1><br><small class='postdate'>$docdate</small><article id='content' class='post'>"
         beforedochtmlwithlink="<h1 class='title'><a href='$3/${docnoext}.html'>$doctitle</a></h1><br><small class='postdate'>$docdate</small><article class='post'>"
         afterdochtml="</article>"
     else
