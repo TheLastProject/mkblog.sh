@@ -128,12 +128,12 @@ build() {
     mkdir "$1/build/pages/"
 
     # Setup navbar and create pages
-    local navdata="<nav id='pages'><ul>"
+    navdata="<nav id='pages'><ul>"
     find "$1/pages/" -name "$(printf "*\n")" -name '*.md' > tmp
     while IFS= read -r page
     do
         helper_build_setfileinfovars "$1" "$page" "pages"
-        local navdata="$navdata<li><a href='pages/${docnoext}.html'>$docnoext</a></li>"
+        navdata="$navdata<li><a href='pages/${docnoext}.html'>$docnoext</a></li>"
 
         helper_build_initpage "$1" "" "$dochtmlfilename"
         helper_build_endpage "$1" "$beforedochtml$(< "$page" markdown)$afterdochtml" "$dochtmlfilename"
@@ -143,15 +143,15 @@ build() {
 
     helper_build_initpage "$1" "$navdata" "$1/build/index.html"
     # Create posts
-    local count=-1
+    count=-1
     find "$1/posts/" -name "$(printf "*\n")" -name '*.md' | sort -r > tmp
     while IFS= read -r post
     do
-        local count=$((count + 1))
+        count=$((count + 1))
         if [ $count -gt 0 ] && [ $((count%10)) -eq 0 ]; then
-            local nextpage=$((page + 1))
+            nextpage=$((page + 1))
             helper_build_endpage "$1" "$(helper_build_generateprevnext "$page" "True")" "$1/build/index$page.html"
-            local page=$nextpage
+            page=$nextpage
             helper_build_initpage "$1" "$navdata" "$1/build/index$page.html"
         fi
         helper_build_setfileinfovars "$1" "$post" "posts"
@@ -160,7 +160,7 @@ build() {
         helper_build_endpage "$1" "$beforedochtml$(< "$post" markdown)$afterdochtml" "$dochtmlfilename"
 
         # Add a short preview and read more link to the homepage
-        local entrypreview=$(sed -n '1,4p;5s/[[:space:]|,|.|?|!]*$/.../p' "$post")
+        entrypreview=$(sed -n '1,4p;5s/[[:space:]|,|.|?|!]*$/.../p' "$post")
 
         { echo "$beforedochtmlwithlink";
           echo "$entrypreview" | markdown;
@@ -191,27 +191,27 @@ helper_build_endpage() {
 # $1 pagenumber
 # $2 hasnext
 helper_build_generateprevnext() {
-    local page=$1
-    local extrahtml="<div id='prevnext'>"
-    local pagesfound=0
+    page=$1
+    extrahtml="<div id='prevnext'>"
+    pagesfound=0
     if [ ! -z "$1" ]; then
-        local pagesfound=$((pagesfound + 1))
-        local previouspage=$(($1 - 1))
+        pagesfound=$((pagesfound + 1))
+        previouspage=$(($1 - 1))
         if [ $previouspage -eq 0 ]; then
-            local previouspage=""
+            previouspage=""
         fi
-        local extrahtml="$extrahtml<a class='prev' href='index$previouspage.html'>&laquo;</a>"
-        local page=$(($1 + 1))
+        extrahtml="$extrahtml<a class='prev' href='index$previouspage.html'>&laquo;</a>"
+        page=$(($1 + 1))
     else
-        local extrahtml="$extrahtml<a class='prev'></a>"
-        local page="1"
+        extrahtml="$extrahtml<a class='prev'></a>"
+        page="1"
     fi
-    local extrahtml="$extrahtml<span class='cur'>$page</span>"
+    extrahtml="$extrahtml<span class='cur'>$page</span>"
     if [ ! -z "$2" ]; then
-        local pagesfound=$((pagesfound + 1))
-        local extrahtml="$extrahtml<a class='next' href='index$page.html'>&raquo;</a>"
+        pagesfound=$((pagesfound + 1))
+        extrahtml="$extrahtml<a class='next' href='index$page.html'>&raquo;</a>"
     else
-        local extrahtml="$extrahtml<a class='next'></a>"
+        extrahtml="$extrahtml<a class='next'></a>"
     fi
 
     # Don't print pagination if there are no other pages
