@@ -9,8 +9,10 @@ First, create a skeleton for your new blog using `mkblog.sh init <directory>`.
 
 Add Markdown files in the subdirectory pages to create additional pages, or in
 posts to create blog posts. For the posts, make sure you follow the
-`yyyy-mm-dd-title.md` naming convention. For example:
-`2016-02-04-Hello, world!.md`.
+`yyyy-mm-dd-time-title.md` naming convention. For example:
+`2016-02-04-17:00-Hello, world!.md`. It is fine to leave out the time, as long
+as the amount of dashes match up. Feel free to name your file
+`2016-02-04--Untimed article.md` if you do not want to add a time.
 
 Then, run `mkblog.sh build <directory>` to build your blog. The HTML will be
 placed in a subdirectory named `build` in the directory you are building.
@@ -27,8 +29,8 @@ If you are doing everything right, your blog directory should look like this.
     │   ├── About.md
     │   └── Contact.md
     ├── posts
-    │   ├── 2016-06-02-Hello again.md
-    │   └── 2016-04-02-Hello, world!.md
+    │   ├── 2016-02-06-17:00-Hello again.md
+    │   └── 2016-02-04--Hello, world!.md
     └── templates
         ├── footer.html
         └── header.html
