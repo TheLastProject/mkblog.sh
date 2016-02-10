@@ -156,11 +156,18 @@ build() {
         fi
         helper_build_setfileinfovars "$1" "$post" "posts"
 
-        helper_build_initpage "$1" "$navdata" "$dochtmlfilename"
-        helper_build_endpage "$1" "$beforedochtml$(< "$post" markdown)$afterdochtml" "$dochtmlfilename"
+        postmarkdown=$(< "$post" markdown)
 
-        # Add a short preview and read more link to the homepage
-        entrypreview=$(sed -n '1,4p;5s/[[:space:]|,|.|?|!]*$/.../p' "$post")
+        helper_build_initpage "$1" "$navdata" "$dochtmlfilename"
+        helper_build_endpage "$1" "$beforedochtml$postmarkdown$afterdochtml" "$dochtmlfilename"
+
+        # Shorten long posts in the preview
+        if [ "$(echo "$postmarkdown" | wc -w)" -gt 50 ]; then
+            # http://stackoverflow.com/a/15612523
+            entrypreview=$(echo "$postmarkdown" | awk -v n=50 'n==c{exit}n-c>=NF{print;c+=NF;next}{for(i=1;i<=n-c;i++)printf "%s ",$i;print x;exit}' | sed -e 's/[[:space:]|,|.|?|!|-]]*$//')"..."
+        else
+            entrypreview=$postmarkdown
+        fi
 
         { echo "$beforedochtmlwithlink";
           echo "$entrypreview" | markdown;
