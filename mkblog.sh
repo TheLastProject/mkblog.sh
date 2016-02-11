@@ -27,7 +27,26 @@ init() {
     # Create directory if nonexistant
     if [ ! -d "$1/" ]; then
         mkdir "$1/"
+    else
+        echo "The chosen directory already exists. Initialize (and possibly overwrite) a blog here anyway? (y/N)"
+        read -r yn
+        case $yn in
+            [Yy]* ) ;;
+            * ) echo "No confirmation, quitting."; exit;;
+        esac
     fi
+    if [ ! -d "$1/variables/" ]; then
+        mkdir "$1/variables/"
+    fi
+    echo "Blog title:"
+    read -r title
+    echo "$title" > "$1/variables/blog_title"
+    echo "Blog subtitle:"
+    read -r subtitle
+    echo "$subtitle" > "$1/variables/blog_subtitle"
+    echo "Blog URL:"
+    read -r url
+    echo "$url" > "$1/variables/blog_url"
     if [ ! -d "$1/templates/" ]; then
         mkdir "$1/templates/"
     fi
@@ -45,7 +64,7 @@ cat <<EOF >"$1/templates/header.html"
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Blog</title>
+  <title>{{ blog_title }}</title>
   <style>
     body {
       width: 640px;
@@ -100,7 +119,8 @@ cat <<EOF >"$1/templates/header.html"
 </head>
 <body>
   <div id='skip'><a href='#content'>Skip to Main Content</a></div>
-  <h1>My Blog</h1>
+  <h1>{{ blog_title }}</h1>
+  <h2>{{ blog_subtitle }}</h2>
 EOF
 
 # Write example footer to templates
@@ -127,19 +147,30 @@ build() {
     mkdir "$1/build/posts/"
     mkdir "$1/build/pages/"
 
-    # Setup navbar and create pages
-    navdata="<nav id='pages'><ul>"
+    # Get blog info
+    helper_read_variables "$1"
+
+    # Setup navbar
+    navdata="<nav id='pages'><ul><li><a href='$blog_url/index.html'>Home</a></li>"
     find "$1/pages/" -name "$(printf "*\n")" -name '*.md' > tmp
     while IFS= read -r page
     do
         helper_build_setfileinfovars "$1" "$page" "pages"
-        navdata="$navdata<li><a href='pages/${docnoext}.html'>$docnoext</a></li>"
-
-        helper_build_initpage "$1" "" "$dochtmlfilename"
-        helper_build_endpage "$1" "$beforedochtml$(< "$page" markdown)$afterdochtml" "$dochtmlfilename"
+        navdata="$navdata<li><a href='$blog_url/pages/${docnoext}.html'>$docnoext</a></li>"
     done < tmp
     rm tmp
     navdata="$navdata</ul></nav><div id='content'>"
+
+    # Create pages
+    find "$1/pages/" -name "$(printf "*\n")" -name '*.md' > tmp
+    while IFS= read -r page
+    do
+        helper_build_setfileinfovars "$1" "$page" "pages"
+
+        helper_build_initpage "$1" "" "$dochtmlfilename"
+        helper_build_endpage "$1" "$navdata$beforedochtml$(< "$page" markdown)$afterdochtml" "$dochtmlfilename"
+    done < tmp
+    rm tmp
 
     helper_build_initpage "$1" "$navdata" "$1/build/index.html"
     # Create posts
@@ -169,20 +200,29 @@ build() {
             entrypreview=$postmarkdown
         fi
 
+        # Add preview to page
         { echo "$beforedochtmlwithlink";
-          echo "$entrypreview" | markdown;
+          echo "$entrypreview";
           echo "$afterdochtml"; } >> "$1/build/index$page.html"
     done < tmp
     rm tmp
 
+    # Finish last page
     helper_build_endpage "$1" "$(helper_build_generateprevnext "$page")" "$1/build/index$page.html"
+}
+
+# $1 = blog directory
+helper_read_variables() {
+    blog_title=$(cat "$1/variables/blog_title")
+    blog_url=$(cat "$1/variables/blog_url")
+    blog_subtitle=$(cat "$1/variables/blog_subtitle")
 }
 
 # $1 = blog directory
 # $2 = nav html
 # $3 = pagename
 helper_build_initpage() {
-  { cat "$1/templates/header.html";
+  { <"$1/templates/header.html" sed 's/{{ blog_title }}/'"$blog_title"'/g' | sed 's/{{ blog_subtitle }}/'"$blog_subtitle"'/g';
     echo "$2"; } >> "$3"
 }
 
@@ -207,7 +247,7 @@ helper_build_generateprevnext() {
         if [ $previouspage -eq 0 ]; then
             previouspage=""
         fi
-        extrahtml="$extrahtml<a class='prev' href='index$previouspage.html'>&laquo;</a>"
+        extrahtml="$extrahtml<a class='prev' href='$blog_url/index$previouspage.html'>&laquo;</a>"
         page=$(($1 + 1))
     else
         extrahtml="$extrahtml<a class='prev'></a>"
@@ -216,7 +256,7 @@ helper_build_generateprevnext() {
     extrahtml="$extrahtml<span class='cur'>$page</span>"
     if [ ! -z "$2" ]; then
         pagesfound=$((pagesfound + 1))
-        extrahtml="$extrahtml<a class='next' href='index$page.html'>&raquo;</a>"
+        extrahtml="$extrahtml<a class='next' href='$blog_url/index$page.html'>&raquo;</a>"
     else
         extrahtml="$extrahtml<a class='next'></a>"
     fi
@@ -243,7 +283,7 @@ helper_build_setfileinfovars() {
         doctitle=${docbasename#*-*-*-*-}
         doctitle=${doctitle%.md}
         beforedochtml="<h1 class='title'>$doctitle</h1><br><small class='postdate'>$docdate</small><article id='content' class='post'>"
-        beforedochtmlwithlink="<h1 class='title'><a href='$3/${docnoext}.html'>$doctitle</a></h1><br><small class='postdate'>$docdate</small><article class='post'>"
+        beforedochtmlwithlink="<h1 class='title'><a href='$blog_url/$3/${docnoext}.html'>$doctitle</a></h1><br><small class='postdate'>$docdate</small><article class='post'>"
         afterdochtml="</article>"
     else
         echo "Software error"
