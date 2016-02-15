@@ -68,7 +68,7 @@ cat <<EOF >"$1/templates/header.html"
   <style>
     body {
       width: 640px;
-      max-width: 100%;
+      max-width: 90%;
       margin: auto;
     }
     #skip a
