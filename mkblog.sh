@@ -47,6 +47,7 @@ init() {
     echo "Blog URL:"
     read -r url
     echo "$url" > "$1/variables/blog_url"
+    echo "markdown" > "$1/variables/blog_mdproc"
     if [ ! -d "$1/templates/" ]; then
         mkdir "$1/templates/"
     fi
@@ -168,7 +169,7 @@ build() {
         helper_build_setfileinfovars "$1" "$page" "pages"
 
         helper_build_initpage "$1" "" "$dochtmlfilename"
-        helper_build_endpage "$1" "$navdata$beforedochtml$(< "$page" markdown)$afterdochtml" "$dochtmlfilename"
+        helper_build_endpage "$1" "$navdata$beforedochtml$(< "$page" "$blog_mdproc")$afterdochtml" "$dochtmlfilename"
     done < tmp
     rm tmp
 
@@ -187,7 +188,7 @@ build() {
         fi
         helper_build_setfileinfovars "$1" "$post" "posts"
 
-        postmarkdown=$(< "$post" markdown)
+        postmarkdown=$(< "$post" "$blog_mdproc")
 
         helper_build_initpage "$1" "$navdata" "$dochtmlfilename"
         helper_build_endpage "$1" "$beforedochtml$postmarkdown$afterdochtml" "$dochtmlfilename"
@@ -216,6 +217,7 @@ helper_read_variables() {
     blog_title=$(cat "$1/variables/blog_title")
     blog_url=$(cat "$1/variables/blog_url")
     blog_subtitle=$(cat "$1/variables/blog_subtitle")
+    blog_mdproc=$(cat "$1/variables/blog_mdproc")
 }
 
 # $1 = blog directory
