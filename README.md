@@ -8,8 +8,8 @@ command.
 
 First, create a skeleton for your new blog using `mkblog.sh init <directory>`.
 This will start a setup wizard to allow you to configure your blog. To change
-an answer given to the wizard, just change the relevant file in the variables
-subdirectory.
+an answer given to the wizard, just change the relevant export in the variables
+subdirectory. You can also add custom variables to use in your template.
 
 Add Markdown files in the subdirectory pages to create additional pages, or in
 posts to create blog posts. For the posts, make sure you follow the
@@ -40,10 +40,6 @@ If you are doing everything right, your blog directory should look like this.
     │   ├── footer.html
     │   └── header.html
     └── variables
-        ├── blog_title
-        ├── blog_url
-        ├── blog_subtitle
-        └── blog_mdproc
 
 ## Dependencies
 
