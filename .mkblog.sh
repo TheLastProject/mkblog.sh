@@ -24,7 +24,7 @@ usage() {
 
 # Init blog
 init() {
-    # Create directory if nonexistant
+    # Create directory if nonexistent
     if [ ! -d "$1/" ]; then
         mkdir "$1/"
     else
@@ -47,12 +47,68 @@ init() {
     if [ ! -d "$1/templates/" ]; then
         mkdir "$1/templates/"
     fi
+    if [ ! -d "$1/static/" ]; then
+        mkdir "$1/static/"
+    fi
     if [ ! -d "$1/pages/" ]; then
         mkdir "$1/pages/"
     fi
     if [ ! -d "$1/posts/" ]; then
         mkdir "$1/posts/"
     fi
+
+# Write example CSS to static
+cat <<EOF >"$1/static/style.css"
+body {
+  width: 640px;
+  max-width: 90%;
+  margin: auto;
+}
+#skip a
+{
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+#skip a:focus
+{
+  position: static;
+  width: auto;
+  height: auto;
+}
+img {
+  max-width: 100%;
+}
+p {
+  line-height: 1.6;
+}
+a {
+  text-decoration: none;
+  color: teal;
+}
+#pages li {
+  display: inline-block;
+  margin: 0 1em;
+}
+#pages a {
+  font-size: 1.25em;
+}
+.title {
+  margin-bottom: 0px;
+}
+#prevnext {
+  width: 100%;
+  text-align: center;
+}
+.prev, .cur, .next {
+  display: inline-block;
+  font-size: 3em;
+  width: 30%;
+}
+EOF
 
 # Write example header to templates
 cat <<'EOF' >"$1/templates/header.html"
@@ -62,57 +118,7 @@ cat <<'EOF' >"$1/templates/header.html"
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${var_title}</title>
-  <style>
-    body {
-      width: 640px;
-      max-width: 90%;
-      margin: auto;
-    }
-    #skip a
-    {
-      position: absolute;
-      left: -10000px;
-      top: auto;
-      width: 1px;
-      height: 1px;
-      overflow: hidden;
-    }
-    #skip a:focus
-    {
-      position: static;
-      width: auto;
-      height: auto;
-    }
-    img {
-      max-width: 100%;
-    }
-    p {
-      line-height: 1.6;
-    }
-    a {
-      text-decoration: none;
-      color: teal;
-    }
-    #pages li {
-      display: inline-block;
-      margin: 0 1em;
-    }
-    #pages a {
-      font-size: 1.25em;
-    }
-    .title {
-      margin-bottom: 0px;
-    }
-    #prevnext {
-      width: 100%;
-      text-align: center;
-    }
-    .prev, .cur, .next {
-      display: inline-block;
-      font-size: 3em;
-      width: 30%;
-    }
-  </style>
+  <link rel="stylesheet" type="text/css" href="${var_url}/static/style.css">
 </head>
 <body>
   <div id='skip'><a href='#content'>Skip to Main Content</a></div>
@@ -143,11 +149,16 @@ build() {
     mkdir "$1/build/"
     mkdir "$1/build/posts/"
     mkdir "$1/build/pages/"
+    mkdir "$1/build/static/"
+
+    # Copy static files
+    cp -r "$1/static/" "$1/build/"
 
     # Get blog info
     . "$1/variables"
 
     # Setup navbar
+    # shellcheck disable=SC2154
     navdata="<nav id='pages'><ul><li><a href='$var_url/index.html'>Home</a></li>"
     find "$1/pages/" -name "$(printf "*\n")" -name '*.md' > tmp
     while IFS= read -r page
@@ -165,6 +176,7 @@ build() {
         helper_build_setfileinfovars "$1" "$page" "pages"
 
         helper_build_initpage "$1" "" "$dochtmlfilename"
+        # shellcheck disable=SC2154
         helper_build_endpage "$1" "$navdata$beforedochtml$(< "$page" "$var_mdproc")$afterdochtml" "$dochtmlfilename"
     done < tmp
     rm tmp
