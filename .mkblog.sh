@@ -155,6 +155,7 @@ build() {
     cp -r "$1/static/" "$1/build/"
 
     # Get blog info
+    # shellcheck disable=SC1090
     . "$1/variables"
 
     # Setup navbar
