@@ -43,10 +43,11 @@ If you are doing everything right, your blog directory should look like this.
 
 ## Dependencies
 
-Aside from standard tooling, mkblog.sh requires a markdown parser that parses
-standard input and sends the HTML to standard output. By default, this is named
-"markdown", but you can change this by editing the `blog_mdproc` file. We
-recommend `discount` (which conveniently does the right thing by default).
+Aside from standard tooling, mkblog.sh requires envsubst, part of gettext, and
+a markdown parser that parses standard input and sends the HTML to standard
+output. By default, this is named "markdown", but you can change this by editing
+the `var_mdproc` file. We recommend `discount` (which conveniently does the right
+thing by default).
 
 ## License
 
