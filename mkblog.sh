@@ -12,4 +12,8 @@
 
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-env -i .mkblog.sh "$@"
+if [ -z "${VISUAL}" ]; then
+    env -i TERM="${TERM}" EDITOR="${VISUAL}" ./.mkblog.sh "$@"
+else
+    env -i TERM="${TERM}" EDITOR="${EDITOR}" ./.mkblog.sh "$@"
+fi

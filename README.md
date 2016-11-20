@@ -11,8 +11,21 @@ This will start a setup wizard to allow you to configure your blog. To change
 an answer given to the wizard, just change the relevant export in the variables
 subdirectory. You can also add custom variables to use in your template.
 
-Add Markdown files in the subdirectory pages to create additional pages, or in
-posts to create blog posts. For the posts, make sure you follow the
+To add more pages to the blog, use `mkblog.sh new_page <directory>`. This will
+prompt you for a title for the page you want to add. If a page by this title
+exists, you will have the option to overwrite it. This will open the new page in
+your text editor (as per the `EDITOR` variable).
+
+To add blog posts, use `mkblog.sh new_post <directory>`. This will prompt you
+for a title for your new post. If you already have a post by this title at the
+same exact time (unlikely unless it's a mistake), you will have the option to
+overwrite it. This will open the new blog post in your text editor (as per the
+`EDITOR` variable).
+
+If you want to add page source files manually, add Markdown files to the `pages`
+subdirectory. The title of the resulting page will be the same as the file,
+minus the extension. If you want to add blog post source files manually, add
+Markdown files to the `posts` subdirectory; make sure you follow the
 `yyyy-mm-dd-time-title.md` naming convention. For example:
 `2016-02-04-17:00-Hello, world!.md`. It is fine to leave out the time, as long
 as the amount of dashes match up. Feel free to name your file
@@ -43,10 +56,15 @@ If you are doing everything right, your blog directory should look like this.
 
 ## Dependencies
 
-Aside from standard tooling, mkblog.sh requires envsubst, part of gettext, and
-a markdown parser that parses standard input and sends the HTML to standard
-output. By default, this is named "markdown", but you can change this by editing
-the `var_mdproc` file. We recommend `discount` (which conveniently does the right
+Aside from standard tooling, mkblog.sh has two dependencies:
+
+* `envsubst`, which is part of GNU Gettext.
+* A Markdown parser that parses standard input and sends the HTML to standard
+  output.
+
+By default, mkblog.sh assumes that the parser program is named "markdown". You
+can change this by editing the `var_mdproc` variable in the `variables` file. We
+recommend `discount` as a parser program (which conveniently does the right
 thing by default).
 
 ## License
