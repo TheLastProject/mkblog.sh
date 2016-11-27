@@ -121,7 +121,7 @@ cat <<'EOF' >"$1/templates/header.html"
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${var_title}</title>
+  <title>${var_page} - ${var_title}</title>
   <link rel="stylesheet" type="text/css" href="${var_url}/static/style.css">
 </head>
 <body>
@@ -225,6 +225,7 @@ build() {
     find "$1/pages/" -name "$(printf "*\n")" -name '*.md' > tmp
     while IFS= read -r page
     do
+        export var_page="$(basename -s .md $page)"
         helper_build_setfileinfovars "$1" "$page" "pages"
 
         helper_build_initpage "$1" "" "$dochtmlfilename"
@@ -233,6 +234,7 @@ build() {
     done < tmp
     rm tmp
 
+    export var_page="Home"
     helper_build_initpage "$1" "$navdata" "$1/build/index.html"
     # Create posts
     count=-1
@@ -250,6 +252,7 @@ build() {
 
         postmarkdown=$(< "$post" "$var_mdproc")
 
+        export var_page="$doctitle"
         helper_build_initpage "$1" "$navdata" "$dochtmlfilename"
         helper_build_endpage "$1" "$beforedochtml$postmarkdown$afterdochtml" "$dochtmlfilename"
 
