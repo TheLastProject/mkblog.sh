@@ -13,14 +13,21 @@ subdirectory. You can also add custom variables to use in your template.
 
 To add more pages to the blog, use `mkblog.sh new_page <directory>`. This will
 prompt you for a title for the page you want to add. If a page by this title
-exists, you will have the option to overwrite it. This will open the new page in
-your text editor (as per the `EDITOR` variable).
+exists, you will have the option to overwrite it.
 
 To add blog posts, use `mkblog.sh new_post <directory>`. This will prompt you
 for a title for your new post. If you already have a post by this title at the
 same exact time (unlikely unless it's a mistake), you will have the option to
-overwrite it. This will open the new blog post in your text editor (as per the
-`EDITOR` variable).
+overwrite it.
+
+When you invoke either `mkblog.sh new_page` or `mkblog.sh new_post`, the new
+post or page will be opened in your editor. This is determined as follows:
+
+* If you have the `VISUAL` environment variable set, the script will use
+  whatever it refers to as your editor.
+* If you don't have `VISUAL` set, but have `EDITOR` set instead, the script will
+  use that.
+* Otherwise, the script will use `vi`.
 
 If you want to add page source files manually, add Markdown files to the `pages`
 subdirectory. The title of the resulting page will be the same as the file,
