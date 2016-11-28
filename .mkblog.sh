@@ -18,9 +18,9 @@ usage() {
     echo "Usage:"
     echo "    mkblog.sh init directory"
     echo "        Create mkblog.sh skeleton in directory."
-    echo "    mkblog.sh new_page directory"
+    echo "    mkblog.sh new page directory"
     echo "        Create a new page in directory."
-    echo "    mkblog.sh new_post directory"
+    echo "    mkblog.sh new post directory"
     echo "        Create a new blog post in directory."
     echo "    mkblog.sh build directory"
     echo "        Build blog using files in directory."
@@ -362,22 +362,20 @@ if [ "$1" = "init" ]; then
 
     init "$2"
     exit 0
-elif [ "$1" = "new_page" ]; then
-    if [ $# -ne 2 ]; then
+elif [ "$1" = "new" ]; then
+    if [ "$#" -ne 3 ]; then
+        usage
+        exit 2
+    elif [ "$2" = "page" ]; then
+        new_page "$3"
+        exit 0
+    elif [ "$2" = "post" ]; then
+        new_post "$3"
+        exit 0
+    else
         usage
         exit 2
     fi
-
-    new_page "$2"
-    exit 0
-elif [ "$1" = "new_post" ]; then
-    if [ $# -ne 2 ]; then
-        usage
-        exit 2
-    fi
-
-    new_post "$2"
-    exit 0
 elif [ "$1" = "build" ]; then
     if [ $# -ne 2 ]; then
         usage

@@ -11,17 +11,13 @@ This will start a setup wizard to allow you to configure your blog. To change
 an answer given to the wizard, just change the relevant export in the variables
 subdirectory. You can also add custom variables to use in your template.
 
-To add more pages to the blog, use `mkblog.sh new_page <directory>`. This will
-prompt you for a title for the page you want to add. If a page by this title
-exists, you will have the option to overwrite it.
-
-To add blog posts, use `mkblog.sh new_post <directory>`. This will prompt you
-for a title for your new post. If you already have a post by this title at the
-same exact time (unlikely unless it's a mistake), you will have the option to
-overwrite it.
-
-When you invoke either `mkblog.sh new_page` or `mkblog.sh new_post`, the new
-post or page will be opened in your editor. This is determined as follows:
+To add content to your blog, use `mkblog.sh new`. This requires two arguments:
+first, what type of content you want (currently one of `page` for an ordinary
+page and `post` for a blog post) and the directory where the blog currently
+lives. This will prompt you for a title for the page or post you want to add. If
+a page or post by the title you give exists already, you will have the option to
+overwrite it. The new post or page will be opened in your editor, which is
+determined as follows:
 
 * If you have the `VISUAL` environment variable set, the script will use
   whatever it refers to as your editor.
