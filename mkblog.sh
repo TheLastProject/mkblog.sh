@@ -17,6 +17,6 @@ if [ -z "${VISUAL}" ]; then
     env -i TERM="${TERM}" EDITOR="${VISUAL}" ./.mkblog.sh "$@"
 elif [ -z "${EDITOR}" ]; then
     env -i TERM="${TERM}" EDITOR="${EDITOR}" ./.mkblog.sh "$@"
-else 
+else
     env -i TERM="${TERM}" EDITOR="vi" ./.mkblog.sh "$@"
 fi
