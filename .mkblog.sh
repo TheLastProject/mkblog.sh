@@ -166,7 +166,7 @@ new_post() {
     # Ensure directory exists
     if [ ! -d "$1" ]; then
         echo "$1 does not exist. Try mkblog.sh init $1"
-        exist 3
+        exit 3
     fi
 
     # Query for blog post title
