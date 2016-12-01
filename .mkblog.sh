@@ -225,8 +225,9 @@ build() {
     find "$1/pages/" -name "$(printf "*\n")" -name '*.md' > tmp
     while IFS= read -r page
     do
-        export var_page="$(basename -s .md $page)"
         helper_build_setfileinfovars "$1" "$page" "pages"
+
+        export var_page="$doctitle"
 
         helper_build_initpage "$1" "" "$dochtmlfilename"
         # shellcheck disable=SC2154
@@ -334,6 +335,7 @@ helper_build_setfileinfovars() {
     if [ "$3" = "pages" ]; then
         beforedochtml="<h1 class='title'>${docnoext}</h1><article id='content' class='page'>"
         afterdochtml="</article>"
+        doctitle=${docnoext}
     elif [ "$3" = "posts" ]; then
         docdate=$(echo "$docbasename" | awk -F '-' '{ printf "%s-%s-%s %s", $1, $2, $3, $4 }')
         doctitle=${docbasename#*-*-*-*-}
