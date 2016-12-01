@@ -18,6 +18,10 @@ usage() {
     echo "Usage:"
     echo "    mkblog.sh init directory"
     echo "        Create mkblog.sh skeleton in directory."
+    echo "    mkblog.sh new page directory"
+    echo "        Create a new page in directory."
+    echo "    mkblog.sh new post directory"
+    echo "        Create a new blog post in directory."
     echo "    mkblog.sh build directory"
     echo "        Build blog using files in directory."
 }
@@ -134,11 +138,58 @@ cat <<EOF >"$1/templates/footer.html"
 EOF
 }
 
+# Make a new page
+new_page() {
+    # Ensure directory exists
+    if [ ! -d "$1" ]; then
+        echo "$1 does not exist. Try mkblog.sh init $1"
+        exit 3
+    fi
+
+    # Query for page title
+    echo "Page title:"
+    read -r page_title
+    if [ -f "$1/pages/${page_title}.md" ]; then
+        echo "This page already exists. Overwrite? (y/N)"
+        read -r yn
+        case ${yn} in
+            [Yy]* ) ;;
+            * ) echo "No confirmation, quitting."; exit;;
+        esac
+    fi
+
+    ${EDITOR} "$1/pages/${page_title}.md"
+}
+
+# Make a new blog post
+new_post() {
+    # Ensure directory exists
+    if [ ! -d "$1" ]; then
+        echo "$1 does not exist. Try mkblog.sh init $1"
+        exit 3
+    fi
+
+    # Query for blog post title
+    echo "Blog post title:"
+    read -r blog_post_title
+    blog_post_title=$(date "+%Y-%m-%d-%H:%M")-${blog_post_title}.md
+    if [ -f "$1/posts/${blog_post_title}" ]; then
+        echo "This post already exists. Overwrite? (y/N)"
+        read -r yn
+        case ${yn} in
+            [Yy]* ) ;;
+            * ) echo "No confirmation, quitting."; exit;;
+        esac
+    fi
+
+    ${EDITOR} "$1/posts/${blog_post_title}"
+}
+
 # Build blog
 build() {
     # Ensure directory exists
     if [ ! -d "$1" ]; then
-        echo "$1 does not exist. Try $(basename "$0") init $1"
+        echo "$1 does not exist. Try mkblog.sh init $1"
         exit 3
     fi
 
@@ -311,6 +362,20 @@ if [ "$1" = "init" ]; then
 
     init "$2"
     exit 0
+elif [ "$1" = "new" ]; then
+    if [ "$#" -ne 3 ]; then
+        usage
+        exit 2
+    elif [ "$2" = "page" ]; then
+        new_page "$3"
+        exit 0
+    elif [ "$2" = "post" ]; then
+        new_post "$3"
+        exit 0
+    else
+        usage
+        exit 2
+    fi
 elif [ "$1" = "build" ]; then
     if [ $# -ne 2 ]; then
         usage
