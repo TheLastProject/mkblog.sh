@@ -15,7 +15,7 @@
 
 if [ -z "${VISUAL}" ] && [ -z "${EDITOR}" ]; then
     env -i TERM="${TERM}" EDITOR="vi" ./.mkblog.sh "$@"
-    
+
 elif [ -z "${EDITOR}" ]; then
     env -i TERM="${TERM}" EDITOR="${VISUAL}" ./.mkblog.sh "$@"
 else
