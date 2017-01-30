@@ -345,13 +345,13 @@ helper_check_and_make_dir() {
 # use of eval is safe - only done on constructed strings which aren't
 # user-defined
 helper_export_into() {
-    eval "printf 'export var_$1='\$$1'\n'" >> "$2"
+    eval printf 'export\ var_%s=\"%s\"\\n' "$1" \"\$"$1"\" >> "$2"
 }
 
 # $1 = prompt message
 # $2 = target variable
 helper_read_into() {
-    printf '%s:\n' "$1"
+    printf '%s:\t' "$1"
     read -r "$2"
 }
 
