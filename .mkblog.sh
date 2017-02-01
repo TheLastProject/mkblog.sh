@@ -351,7 +351,7 @@ helper_export_into() {
 # $1 = prompt message
 # $2 = target variable
 helper_read_into() {
-    printf '%s:\t' "$1"
+    printf '%s: ' "$1"
     read -r "$2"
 }
 
