@@ -70,6 +70,11 @@ can change this by editing the `var_mdproc` variable in the `variables` file. We
 recommend `discount` as a parser program (which conveniently does the right
 thing by default).
 
+## Known limitations
+
+Blog titles and blog subtitles cannot contain double quotes anywhere - this will
+cause unpredictable results if you try.
+
 ## License
 
 mkblog.sh is licensed under the GNU AGPLv3+, with the exception of the files
