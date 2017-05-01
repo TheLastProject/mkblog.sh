@@ -103,6 +103,7 @@ cat <<'EOF' >"$1/templates/header.html"
 <html>
 <head>
   <meta charset="utf-8" />
+  <meta name="generator" content="mkblog.sh" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${var_page} - ${var_title}</title>
   <link rel="stylesheet" type="text/css" href="${var_url}/static/style.css">
